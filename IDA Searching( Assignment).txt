@@ -1,0 +1,173 @@
+IDA* SERACHING
+
+-----------Introduction--------
+Iterative deepening A* (IDA*) is a graph traversal and path search algorithm that can find the shortest path between a designated start node and any member of a set of goal nodes in a weighted graph. It is a variant of iterative deepening depth-first search that borrows the idea to use a heuristic function to evaluate the remaining cost to get to the goal from the A* search algorithm. Since it is a depth-first search algorithm, its memory usage is lower than in A*, but unlike ordinary iterative deepening search, it concentrates on exploring the most promising nodes and thus does not go to the same depth everywhere in the search tree. Unlike A*, IDA* does not utilize dynamic programming and therefore often ends up exploring the same nodes many times.
+
+While the standard iterative deepening depth-first search uses search depth as the cutoff for each iteration, the IDA* uses the more informative 
+{\displaystyle f(n)=g(n)+h(n)} f(n)=g(n)+h(n), where {\displaystyle g(n)}g(n) is the cost to travel from the root to node {\displaystyle n}n and {\displaystyle h(n)}h(n) is a problem-specific heuristic estimate of the cost to travel from {\displaystyle n}n to the goal.
+
+------------Iterative-deepening-A* works as follows: ---------------
+at each iteration, perform a depth-first search, cutting off a branch when its total cost {\displaystyle f(n)=g(n)+h(n)}f(n)=g(n)+h(n) exceeds a given threshold. This threshold starts at the estimate of the cost at the initial state, and increases for each iteration of the algorithm. At each iteration, the threshold used for the next iteration is the minimum cost of all values that exceeded the current threshold.
+
+Iterative-deepening searches mimic a breadth-first node expansion with a series of depth-first searches that operate with successively extended search horizons. They have been proposed as a simple way to reduce the space complexity of best-first searches like A* from exponential to linear in the search depth. But there is more to iterative-deepening than just a reduction of storage space.
+
+The search efficiency can be greatly improved by exploiting previously gained node information. The information management techniques considered here owe much to their counterparts from the domain of two-player games, namely the use of fast-execution memory functions to guide the search. The authors' methods not only save node expansions, but are also faster and easier to implement than previous proposals.
+
+IDA* is a memory constrained version of A*. It does everything that the A* does, it has the optimal characteristics of A* to find the shortest path but it uses less memory than A*.
+
+------------------Algorithm---------------------------------------------------
+
+root=initial node;
+Goal=final node;
+function IDA*()                                             //Driver function
+{
+
+threshold=heuristic(Start);
+while(1)             //run for infinity
+{
+
+integer temp=search(Start,0,threshold); //function search(node,g score,threshold)
+if(temp==FOUND)                                 //if goal found
+         return FOUND;                                             
+if(temp== ∞)                               //Threshold larger than maximum possible f value
+         return;                               //or set Time limit exceeded
+threshold=temp;
+
+}
+
+}
+function Search(node, g, threshold)              //recursive function
+{
+
+f=g+heuristic(node);
+if(f>threshold)             //greater f encountered
+         return f;
+if(node==Goal)               //Goal node found
+         return FOUND;
+integer min=MAX_INT;     //min= Minimum integer
+foreach(tempnode in nextnodes(node))
+{
+
+//recursive call with next node as current node for depth search
+integer temp=search(tempnode,g+cost(node,tempnode),threshold);  
+if(temp==FOUND)            //if goal found
+return FOUND;
+if(temp<min)     //find the minimum of all ‘f’ greater than threshold encountered                                min=temp;
+
+}
+return min;  //return the minimum ‘f’ encountered greater than threshold
+
+}
+function nextnodes(node)
+{
+             return list of all possible next nodes from node;
+}
+-------------------------------------------------------------------
+-----------Working-------------------------------------------------------
+The key feature of the IDA* algorithm is that it doesn’t keep a track of each visited node which helps in saving memory consumption and can be used where memory is constrained. It is mostly similar to Iterative deepening search, the only difference is that instead of reaching same depth for every branch it decides the depth using the f score called as the ‘threshold’ which increases when a node with greater f score is reached and the algorithm starts all over again from the beginning upto to the new depth.
+
+So we use an infinite loop which is the base the function that is called in recursion, when the function returns from the threshold it starts from the beginning through this infinite loop where the function is called initially and the threshold is increased after each return.
+
+The threshold is not just randomly increased but it depends on what the recursive function returns as the new threshold. During the recursion whenever a node with higher f score than the threshold is reached that node is not futher explored but he f scored is noted, since we encounter many such nodes, the minimum of these f score is returned as the new threshold.
+
+What is f score?
+
+f score is nothing but the sum of the cost to reach that node and the heuristic value of that node.
+
+For any give node the f score is defined as:
+
+f(x)=h(x)+g(x)
+where g(x) is the cost of that node, h(x) is the calculated heuristic of that node and x is the current node.
+
+What is g score(cost)?
+
+g score is defined as the sum of g score of the parent node and the cost to travel to that node from it’s parent.
+
+g(x)=g(x.parent)+cost(x.parent,x)
+What is h score(heuristic)?
+
+Heuristic score is different for each question as explained above heuristic needs to be admissible for each type of problem. I’ll not discuss about various heuristics here as this is just to explain general working of IDA*.
+
+------------------------------------
+-----Properties------------------------------------
+
+Like A*, IDA* is guaranteed to find the shortest path leading from the given start node to any goal node in the problem graph, if the heuristic function h is admissible,[2] that is
+
+{\displaystyle h(n)\leq h^{*}(n)}h(n)\leq h^{*}(n)
+for all nodes n, where h* is the true cost of the shortest path from n to the nearest goal (the "perfect heuristic").[3]
+
+IDA* is beneficial when the problem is memory constrained. A* search keeps a large queue of unexplored nodes that can quickly fill up memory. By contrast, because IDA* does not remember any node except the ones on the current path, it requires an amount of memory that is only linear in the length of the solution that it constructs. Its time complexity is analyzed by Korf et al. under the assumption that the heuristic cost estimate h is consistent, meaning that
+
+{\displaystyle h(n)\leq \mathrm {cost} (n,n')+h(n')}h(n)\leq {\mathrm  {cost}}(n,n')+h(n')
+for all nodes n and all neighbors n' of n; they conclude that compared to a brute-force tree search over an exponential-sized problem, IDA* achieves a smaller search depth (by a constant factor), but not a smaller branching factor.[4]
+
+Recursive best-first search is another memory-constrained version of A* search that can be faster in practice than IDA*, since it requires less regenerating of nodes.
+
+
+
+------------------------------------------------
+1.4 Iterative Deepening A∗(IDA∗) Search
+It tries to overcome the disadvantage of A∗ algorithm. A∗ algorithm expands all nodes with lower f value before it takes up higher f value. IDA∗ follows the idea similar to ID search: exhaust all nodes upto a certain bound before expanding to next level of bound. This bound can be cost, cost made so far, depth etc. Overview of the IDA∗ algorithm is given in algorithm 2.
+Algorithm 2 IDA∗ algorithm overview while (solution not found) do DFS but prune when cost(f) > current bound  increase bound It says that just do DFS as long as our f increases upto a certian bound. When it reaches the specified bound then stop and backtrack. Then increase the bound and continue. 1.5. DEPTH FIRST BRANCH & BOUND SEARCH 5 IDA∗ is not systematic. But, IDA∗ never expands to a node where cost > optimal cost. For real problems, often IDA∗ search algorithm is used instead of A∗ search algorithm 
+----------------------Applications--------------------
+Applications of IDA* are found in such problems as planning.
+Iterative deepening A* (IDA*) is a graph traversal and path search algorithm that can find the shortest path between a designated start node and any member of a set of goal nodes in a weighted graph.
+
+
+
+--------------------Pros:----------------
+It will always find the optimal solution provided that it exist’s and that if a heuristic is supplied it must be admissible.
+Heuristic is not necessary, it is used to speed up the process.
+Various heuristics can be integrated to the algorithm without changing the basic code.
+The cost of each move can be tweaked into the algorithms as easily as the heuristic
+Uses a lot less memory which increases linearly as it doesn’t store and forgets after it reaches a certain depth and start over again.
+--------------------Cons:---------------------
+Doesn’t keep track of visited nodes and thus explores already explored nodes again.
+Slower due to repeating the exploring of explored nodes.
+Requires more processing power and time than A*.
+
+
+
+----------------------Prerequisite knowledge -----------------------
+
+ what is a graph? 
+
+graph is a representation of a set of objects where some pairs of objects are connected by links. The interconnected objects are represented by mathematical abstractions called vertices (also called nodes or points), and the links that connect some pairs of vertices are called edges (also called arcs or lines).Source.
+
+
+
+As shown in Figure 1 above. From programming point of view a node is where all your information is stored for a particular state of the problem, like current coordinates in pathfinding. The edge is nothing but the pointer to the next node which is stored in the previous node.The distance between each node is called the cost.
+
+There are various types of graphs like cyclic graph, acyclic, directed cyclic,directed acyclic etc etc, explaining them will be off topic.
+
+Let’s take the example of the water jug problem.In this particular example we have one 5 gallon jug and one 3 gallon jug, we have to collect 4 gallons.
+
+bfs12
+FIGURE 2.
+
+As you see in Figure 2 the problem is converted into a tree and as you know a tree is a special case of a Directed acyclic graph(DAG) thus IDA* can be applied here as well.
+
+The figure is almost self explanatory still I’ll explain how it goes, so the nodes have data as the amount of water in each jug and these are further linked with each step possible from the previous node. As you see, the initial node is the start node where both the jugs are empty from here there are two possible states i.e either fill the 3 gallon jug or the 5 gallon jug, thus the two nodes linked to the start. Now if we see the LHS of the tree at depth 1 there are two possible steps i.e either pour the water from the 3 gallon jug to the 5 gallon jug or fill the 5 gallon jug which is described by the nodes.
+
+This is a simple example of converting your problem space to a tree for implementation of IDA*.
+
+Note: The water in jug when poured to a container with less capacity  then the extra water will not be counted. Also the jugs can be emptied as a move.
+
+You need to have an admissible heuristic for the problem for optimal and faster search(Optional).
+What is an admissible heuristic?
+
+An admissible heuristic is which calculates the estimated cost to the goal state and is always lower than or equal to the actual cost of reaching the goal state i.e it never overestimates the cost to reach the goal. A consistent or monotone heuristic can also be used which means that it is admissible and it is equal to the cost to goal plus the estimated distance from each neighbor  in which case the solution will be found the fastest and the least unnecessary nodes would be generated.
+
+Why do we need heuristics?
+
+Heuristics are the main component of the algorithm i.e the brains of the algorithm without it the algorithm is not intelligent, heuristics give boundaries to the algorithm, as in which not to select and which to not since heuristics give the general estimate of the distance to goal node helping the algorithm to choose the optimal node in the next step.
+
+You need to know or figure out the cost required to travel from one node to other.
+Usually the cost is taken as 1 but it can differ according to where you want to implement it. For example a diagonal move can cost 1.41 if you are implementing it in a 2D map with each tile as a square of 1 x 1 through Pythagoras or for example if a node represents a tile containing water which slows down the movement can be valued 2 etc.
+
+You need to be familiar with recursion.
+Recursion in computer science is a method where the solution to a problem depends on solutions to smaller instances of the same problem. In recursion we call the same function within that function and thus infinite set of objects can be defined by finite statements. The reason you need to be familiar with recursion is because you need to understand the flow of program in recursive functions otherwise it will be very tough to customize and terminate the algorithm according to your convenience.
+-------------------------------------------------
+https://algorithmsinsight.wordpress.com/graph-theory-2/ida-star-algorithm-in-general/
+-----------------------------------------------
+
